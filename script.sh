@@ -31,11 +31,10 @@ else
     cat > $prefix/setup-jest.ts << ENDOFFILE
 import 'jest-preset-angular/setup-jest';
 ENDOFFILE
-    echo jest init
-    npm --prefix $prefix exec jest --init
+    cd $prefix
+    npx jest --init
 #TODO: Set preset and setupfilesAfterEnv in jest.config.ts
-    echo ts-node
-    npm --prefix $prefix i ts-node
+    npm i ts-node
 #TODO: Update tsconfig.spec.json
 #TODO: Update package.json
   fi
