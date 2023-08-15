@@ -23,20 +23,46 @@ else
     prefix=$1/$2
     echo $prefix
     npm i -g @angular/cli
-    ng new $2 --directory $prefix
+    ng new $2 --directory $prefix --routing true --style scss
     npm --prefix $prefix uninstall karma karma-chrome-launcher karma-coverage karma-jasmine karma-jasmine-html-reporter @types/jasmine jasmine-core
-#TODO: remove test object from angular.json
+    node refactorAngularJson $prefix/angular.json $2
     npm --prefix $prefix i - save-dev jest @types/jest  jest-preset-angular
     echo cat
     cat > $prefix/setup-jest.ts << ENDOFFILE
 import 'jest-preset-angular/setup-jest';
 ENDOFFILE
-    cd $prefix
-    npx jest --init
-#TODO: Set preset and setupfilesAfterEnv in jest.config.ts
-    npm i ts-node
-#TODO: Update tsconfig.spec.json
-#TODO: Update package.json
+    cat > $prefix/jest.config.ts << ENDOFFILE
+import type {Config} from 'jest';
+
+const config: Config = {
+  collectCoverage: true,
+  coverageDirectory: "coverage",
+  coverageProvider: "v8",
+  preset: 'jest-preset-angular',
+  setupFilesAfterEnv: ['<rootDir>/setup-jest.ts'],
+};
+
+export default config;
+ENDOFFILE
+    npm --prefix $prefix i ts-node
+    cat > $prefix/tsconfig.spec.json << ENDOFFILE
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec",
+    "types": [
+      "jest" // 1
+    ],
+    "esModuleInterop": true, // 2
+    "emitDecoratorMetadata": true // 3
+  },
+  "include": [
+    "src/**/*.spec.ts",
+    "src/**/*.d.ts"
+  ]
+}
+ENDOFFILE
+  node refactorPackageJson $prefix/package.json
   fi
 
 fi
