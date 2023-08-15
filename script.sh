@@ -1,9 +1,5 @@
 #!/bin/bash
 
-echo $0
-
-
-
 if [ -z "$1" ]
 then
   echo A path to install folder is required!
@@ -20,6 +16,7 @@ else
     exit 1
 
   else
+    npm i
     prefix=$1/$2
     echo $prefix
     npm i -g @angular/cli
