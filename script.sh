@@ -16,18 +16,46 @@ else
     exit 1
 
   else
+	echo
+	echo Installing dependencies...
     npm i
     prefix=$1/$2
-    echo $prefix
+	dir=$(pwd)
+	echo dir: $dir
+	
+	echo
+    echo Prefex: $prefix
+	
+	echo
+	echo Installing Angular CLI...
     npm i -g @angular/cli
-    ng new $2 --directory $prefix --routing true --style scss
+	
+	echo
+	echo Creating Project...
+	cd $1
+    ng new $2 --routing true --style scss
+	cd $dir
+	
+	echo
+	echo Removing Karma...
     npm --prefix $prefix uninstall karma karma-chrome-launcher karma-coverage karma-jasmine karma-jasmine-html-reporter @types/jasmine jasmine-core
+	
+	echo
+	echo Refactoring Angular.json...
     node refactorAngularJson $prefix/angular.json $2
+	
+	echo
+	echo Installing Jest...
     npm --prefix $prefix i - save-dev jest @types/jest  jest-preset-angular
-    echo cat
+	
+	echo
+	echo Setting up Jest...
     cat > $prefix/setup-jest.ts << ENDOFFILE
 import 'jest-preset-angular/setup-jest';
 ENDOFFILE
+
+	echo
+	echo Modifying jest.config.ts...
     cat > $prefix/jest.config.ts << ENDOFFILE
 import type {Config} from 'jest';
 
@@ -41,7 +69,13 @@ const config: Config = {
 
 export default config;
 ENDOFFILE
+
+	echo
+	echo Installing TS-Node...
     npm --prefix $prefix i ts-node
+	
+	echo
+	echo Modifying tsconfig.spec.json...
     cat > $prefix/tsconfig.spec.json << ENDOFFILE
 {
   "extends": "./tsconfig.json",
@@ -59,6 +93,9 @@ ENDOFFILE
   ]
 }
 ENDOFFILE
+
+	echo
+	echo Refactoring package.json...
   node refactorPackageJson $prefix/package.json
   fi
 
